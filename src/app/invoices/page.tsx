@@ -1,3 +1,5 @@
+"use client";
+
 import { AppLayout } from '@/components/layout/app-layout';
 import { PageTitle } from '@/components/page-title';
 import { Button } from '@/components/ui/button';
@@ -20,6 +22,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import jsPDF from 'jspdf';
 
 const mockInvoices = [
   { id: 'INV-001', clientName: 'Globex Corporation', date: '2023-10-01', dueDate: '2023-10-31', amount: '$1,200.00', status: 'Paid' },
@@ -38,6 +41,30 @@ const invoiceStatusVariantMap: { [key: string]: "default" | "secondary" | "destr
 
 
 export default function InvoicesPage() {
+
+  const handleDownloadPdf = (invoice: typeof mockInvoices[0]) => {
+    const doc = new jsPDF();
+
+    doc.setFontSize(22);
+    doc.text("Invoice", 105, 20, { align: 'center' });
+
+    doc.setFontSize(12);
+    doc.text(`Invoice ID: ${invoice.id}`, 14, 40);
+    doc.text(`Client: ${invoice.clientName}`, 14, 50);
+    doc.text(`Date: ${invoice.date}`, 14, 60);
+    doc.text(`Due Date: ${invoice.dueDate}`, 14, 70);
+    doc.text(`Amount: ${invoice.amount}`, 14, 80);
+    doc.text(`Status: ${invoice.status}`, 14, 90);
+    
+    // Add a line for separation
+    doc.line(14, 100, 196, 100); 
+
+    // Example of adding more details or a table - keep it simple for now
+    doc.text("Thank you for your business!", 105, 120, { align: 'center'});
+
+    doc.save(`${invoice.id}.pdf`);
+  };
+
   return (
     <AppLayout>
       <div className="flex items-center justify-between">
@@ -85,7 +112,7 @@ export default function InvoicesPage() {
                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
                       <DropdownMenuItem>View Invoice</DropdownMenuItem>
                       <DropdownMenuItem>Edit Invoice</DropdownMenuItem>
-                      <DropdownMenuItem>Download PDF</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleDownloadPdf(invoice)}>Download PDF</DropdownMenuItem>
                       <DropdownMenuItem>Send Email</DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem className="text-destructive">Delete Invoice</DropdownMenuItem>
