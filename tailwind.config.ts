@@ -10,8 +10,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        body: ['PT Sans', 'sans-serif'],
-        headline: ['Playfair Display', 'serif'],
+        body: ['Barlow', 'sans-serif'],
+        headline: ['Barlow', 'sans-serif'], // Changed to Barlow
         code: ['Source Code Pro', 'monospace'],
       },
       colors: {
