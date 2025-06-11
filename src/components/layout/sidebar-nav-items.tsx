@@ -1,3 +1,4 @@
+
 import type { LucideIcon } from 'lucide-react';
 import {
   HomeIcon,
@@ -12,6 +13,7 @@ import {
   StickyNoteIcon,
   BellIcon,
   NetworkIcon,
+  ListTodoIcon, // Added for Tasks
 } from 'lucide-react';
 
 export interface NavItem {
@@ -54,6 +56,13 @@ export const navItems: NavItem[] = [
     icon: BriefcaseIcon,
     variant: 'ghost',
     tooltip: 'Clients',
+  },
+   {
+    title: 'Tasks', // Added Tasks
+    href: '/tasks',
+    icon: ListTodoIcon,
+    variant: 'ghost',
+    tooltip: 'Tasks',
   },
   {
     title: 'Invoices',
