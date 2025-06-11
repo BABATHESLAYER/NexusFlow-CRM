@@ -22,7 +22,7 @@ h1, h2, h3, h4, h5, h6 {
     --popover-foreground: 0 0% 0%; /* Black */
 
     --primary: 270 50% 40%; /* Rebeccapurple */
-    --primary-foreground: 270 50% 95%; /* Light purple / White */
+    --primary-foreground: 0 0% 100%; /* White */
 
     --secondary: 270 50% 90%; /* Light Rebeccapurple */
     --secondary-foreground: 270 50% 20%; /* Darker Rebeccapurple */
@@ -43,13 +43,13 @@ h1, h2, h3, h4, h5, h6 {
     --radius: 0.5rem;
 
     /* Sidebar specific colors */
-    --sidebar-background: 0 0% 97%; /* Slightly off-white */
-    --sidebar-foreground: 0 0% 0%; /* Black */
-    --sidebar-primary: 270 50% 40%; /* Rebeccapurple */
-    --sidebar-primary-foreground: 270 50% 95%; /* Light purple / White */
-    --sidebar-accent: 270 50% 90%; /* Light Rebeccapurple for hover */
-    --sidebar-accent-foreground: 270 50% 20%; /* Darker purple on hover */
-    --sidebar-border: 0 0% 80%; /* Gray border */
+    --sidebar-background: 270 50% 90%; /* Light Rebeccapurple */
+    --sidebar-foreground: 270 50% 20%; /* Darker Rebeccapurple for text */
+    --sidebar-primary: 270 50% 40%; /* Main Rebeccapurple for active items */
+    --sidebar-primary-foreground: 0 0% 100%; /* White text on active items */
+    --sidebar-accent: 270 50% 80%; /* Slightly darker/more saturated light purple for hover */
+    --sidebar-accent-foreground: 270 50% 15%; /* Darkest purple for text on hover */
+    --sidebar-border: 270 50% 75%; /* Border for the sidebar */
     --sidebar-ring: 270 50% 45%; /* Rebeccapurple */
 
     --chart-1: 270 50% 40%; /* Primary - Rebeccapurple */
@@ -70,7 +70,7 @@ h1, h2, h3, h4, h5, h6 {
     --popover-foreground: 0 0% 98%; /* Near white */
 
     --primary: 270 50% 55%; /* Lighter Rebeccapurple */
-    --primary-foreground: 270 50% 5%; /* Very dark purple/black */
+    --primary-foreground: 0 0% 5%; /* Very dark purple/black */
 
     --secondary: 270 20% 25%; /* Darker, desaturated purple */
     --secondary-foreground: 0 0% 90%; /* Light gray */
@@ -79,7 +79,7 @@ h1, h2, h3, h4, h5, h6 {
     --muted-foreground: 0 0% 60%; /* Medium-light gray */
 
     --accent: 270 50% 65%; /* Brighter Rebeccapurple */
-    --accent-foreground: 270 50% 5%; /* Very dark purple/black */
+    --accent-foreground: 0 0% 5%; /* Very dark purple/black */
 
     --destructive: 0 63% 51%; /* Red (current) */
     --destructive-foreground: 0 0% 98%; /* Light text (current) */
@@ -89,13 +89,13 @@ h1, h2, h3, h4, h5, h6 {
     --ring: 270 50% 50%; /* Rebeccapurple for rings */
     
     /* Sidebar specific colors - dark mode */
-    --sidebar-background: 270 10% 8%; /* Even darker purple */
-    --sidebar-foreground: 0 0% 96%; /* Light gray */
-    --sidebar-primary: 270 50% 55%; /* Lighter Rebeccapurple */
-    --sidebar-primary-foreground: 270 50% 5%; /* Very dark purple/black */
-    --sidebar-accent: 270 20% 20%; /* Darker purple accent for hover */
-    --sidebar-accent-foreground: 0 0% 96%; /* Light gray */
-    --sidebar-border: 270 10% 20%; /* Darker border */
+    --sidebar-background: 270 10% 12%; /* A bit lighter than main dark bg */
+    --sidebar-foreground: 0 0% 96%; /* Light gray text */
+    --sidebar-primary: 270 50% 55%; /* Lighter Rebeccapurple (active item, matches general dark primary) */
+    --sidebar-primary-foreground: 0 0% 5%; /* Very dark purple/black text for active item */
+    --sidebar-accent: 270 10% 18%; /* Hover state, slightly lighter/more saturated than sidebar-bg */
+    --sidebar-accent-foreground: 0 0% 98%; /* White text on hover */
+    --sidebar-border: 270 10% 8%; /* Border for the sidebar itself, darker than its bg */
     --sidebar-ring: 270 50% 50%; /* Rebeccapurple */
 
     --chart-1: 270 50% 55%;
