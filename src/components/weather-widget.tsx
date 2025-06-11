@@ -1,8 +1,10 @@
+
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { SunIcon, CloudIcon, CloudRainIcon, CloudSnowIcon, CloudLightningIcon, ThermometerIcon } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { SunIcon, CloudIcon, CloudRainIcon, CloudSnowIcon, CloudLightningIcon } from "lucide-react";
 import { useState, useEffect } from 'react';
+import { cn } from "@/lib/utils";
 
 // Mock weather data
 const weatherConditions = [
@@ -15,7 +17,7 @@ const weatherConditions = [
 
 export function WeatherWidget() {
   const [currentWeather, setCurrentWeather] = useState(weatherConditions[0]);
-  const [location, setLocation] = useState("Current Location");
+  const [location, setLocation] = useState("Loading..."); // Changed initial state
 
   useEffect(() => {
     // Simulate fetching weather data
@@ -27,39 +29,37 @@ export function WeatherWidget() {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           try {
-            // Basic reverse geocoding (example, replace with a real API for production)
-            // This is a placeholder and might not work reliably without an API key
             const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${position.coords.latitude}&lon=${position.coords.longitude}`);
             if (response.ok) {
               const data = await response.json();
-              setLocation(data.address?.city || data.address?.town || data.address?.village || "Current Location");
+              setLocation(data.address?.city || data.address?.town || data.address?.village || "Location");
+            } else {
+              setLocation("Location");
             }
           } catch (error) {
             console.error("Error fetching location name:", error);
-            setLocation("Current Location");
+            setLocation("Location");
           }
         },
         () => {
-          setLocation("Current Location"); // Geolocation denied or failed
+          setLocation("Location"); // Geolocation denied or failed
         }
       );
+    } else {
+      setLocation("Location"); // Geolocation not supported
     }
   }, []);
 
   const { Icon, name, temp } = currentWeather;
 
   return (
-    <Card className="bg-card/70 backdrop-blur-md border rounded-xl shadow-lg dark:bg-card/50">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium font-body">Weather</CardTitle>
-        <ThermometerIcon className="h-4 w-4 text-muted-foreground" />
-      </CardHeader>
-      <CardContent>
-        <div className="flex items-center space-x-4">
-          <Icon className="h-12 w-12 text-primary" />
-          <div>
-            <p className="text-2xl font-bold font-headline">{temp}</p>
-            <p className="text-xs text-muted-foreground">{name} in {location}</p>
+    <Card className="w-auto shadow-xl backdrop-blur-md bg-card/80 dark:bg-card/70 border rounded-lg">
+      <CardContent className="p-2">
+        <div className="flex items-center space-x-2">
+          <Icon className="h-6 w-6 text-primary flex-shrink-0" />
+          <div className="overflow-hidden">
+            <p className="text-base font-bold font-headline truncate">{temp}</p>
+            <p className="text-xs text-muted-foreground truncate" title={`${name} in ${location}`}>{name} - {location}</p>
           </div>
         </div>
       </CardContent>

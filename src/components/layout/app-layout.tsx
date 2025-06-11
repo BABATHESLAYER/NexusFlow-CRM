@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from 'react';
@@ -16,6 +17,7 @@ import { AppHeader } from './app-header';
 import { navItems, AppLogo, AppName } from './sidebar-nav-items';
 import { SidebarNav } from './sidebar-nav';
 import { SettingsIcon } from 'lucide-react';
+import { WeatherWidget } from '@/components/weather-widget'; // Import WeatherWidget
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -56,6 +58,15 @@ export function AppLayout({ children }: AppLayoutProps) {
         <main className="flex-1 overflow-auto p-4 sm:p-6 lg:p-8 bg-background">
           {children}
         </main>
+        <div 
+          className="fixed bottom-4 z-40 
+                     left-4 
+                     md:left-[calc(var(--sidebar-width-icon)_+1rem)] 
+                     group-data-[sidebar-state=expanded]/sidebar-wrapper:md:left-[calc(var(--sidebar-width)_+1rem)]
+                     transition-all duration-200 ease-linear"
+        >
+          <WeatherWidget />
+        </div>
       </SidebarInset>
     </SidebarProvider>
   );

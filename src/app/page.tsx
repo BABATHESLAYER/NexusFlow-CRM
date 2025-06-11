@@ -1,7 +1,7 @@
 
+
 import { AppLayout } from '@/components/layout/app-layout';
 import { PageTitle } from '@/components/page-title';
-import { WeatherWidget } from '@/components/weather-widget';
 import { CrmAssistantChat } from '@/components/crm-assistant-chat';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,11 +12,6 @@ export default function HomePage() {
   return (
     <AppLayout>
       <PageTitle title="Welcome to NexusFlow CRM" description="Your central hub for managing customer relationships and streamlining workflows." />
-      
-      {/* Weather Widget - centered */}
-      <div className="mb-8 flex justify-center">
-        <WeatherWidget />
-      </div>
       
       {/* CRM Assistant Chat */}
       <div className="mb-8">
