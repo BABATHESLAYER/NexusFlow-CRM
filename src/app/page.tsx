@@ -1,3 +1,4 @@
+
 import { AppLayout } from '@/components/layout/app-layout';
 import { PageTitle } from '@/components/page-title';
 import { WeatherWidget } from '@/components/weather-widget';
@@ -12,35 +13,39 @@ export default function HomePage() {
     <AppLayout>
       <PageTitle title="Welcome to NexusFlow CRM" description="Your central hub for managing customer relationships and streamlining workflows." />
       
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <Card className="lg:col-span-2 shadow-lg hover:shadow-xl transition-shadow duration-300">
-          <CardHeader>
-            <CardTitle className="font-headline text-2xl">Get Started</CardTitle>
-            <CardDescription>Explore the core features of NexusFlow CRM.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p>
-              Navigate through your dashboard, manage leads and clients, create invoices, schedule events,
-              and gain valuable insights from your data. The AI Assistant is here to help you along the way!
-            </p>
-            <div className="flex flex-wrap gap-2">
-              <Button asChild variant="default">
-                <Link href="/dashboard">Go to Dashboard <ArrowRightIcon className="ml-2 h-4 w-4" /></Link>
-              </Button>
-              <Button asChild variant="outline">
-                <Link href="/leads">Manage Leads</Link>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+      {/* Get Started Card */}
+      <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 mb-6">
+        <CardHeader>
+          <CardTitle className="font-headline text-2xl">Get Started</CardTitle>
+          <CardDescription>Explore the core features of NexusFlow CRM.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p>
+            Navigate through your dashboard, manage leads and clients, create invoices, schedule events,
+            and gain valuable insights from your data. The AI Assistant is here to help you along the way!
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <Button asChild variant="default">
+              <Link href="/dashboard">Go to Dashboard <ArrowRightIcon className="ml-2 h-4 w-4" /></Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link href="/leads">Manage Leads</Link>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
+      {/* Weather Widget - centered */}
+      <div className="mb-8 flex justify-center">
         <WeatherWidget />
       </div>
-
-      <div className="mt-8">
+      
+      {/* CRM Assistant Chat - moved up */}
+      <div className="mb-8">
         <CrmAssistantChat />
       </div>
 
+      {/* Quick Actions & Recent Activity grid */}
       <div className="mt-8 grid gap-6 md:grid-cols-2">
         <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
           <CardHeader>
