@@ -15,7 +15,6 @@ export default function HomePage() {
       
       {/* Get Started Card & CRM Assistant Chat - Side by Side */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-        <CrmAssistantChat />
         <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
           <CardHeader>
             <CardTitle className="font-headline text-2xl">Get Started</CardTitle>
@@ -36,6 +35,7 @@ export default function HomePage() {
             </div>
           </CardContent>
         </Card>
+        <CrmAssistantChat />
       </div>
 
       {/* Quick Actions & Recent Activity grid */}
