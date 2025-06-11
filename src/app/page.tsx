@@ -13,6 +13,16 @@ export default function HomePage() {
     <AppLayout>
       <PageTitle title="Welcome to NexusFlow CRM" description="Your central hub for managing customer relationships and streamlining workflows." />
       
+      {/* Weather Widget - centered */}
+      <div className="mb-8 flex justify-center">
+        <WeatherWidget />
+      </div>
+      
+      {/* CRM Assistant Chat */}
+      <div className="mb-8">
+        <CrmAssistantChat />
+      </div>
+
       {/* Get Started Card */}
       <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 mb-6">
         <CardHeader>
@@ -34,16 +44,6 @@ export default function HomePage() {
           </div>
         </CardContent>
       </Card>
-
-      {/* Weather Widget - centered */}
-      <div className="mb-8 flex justify-center">
-        <WeatherWidget />
-      </div>
-      
-      {/* CRM Assistant Chat - moved up */}
-      <div className="mb-8">
-        <CrmAssistantChat />
-      </div>
 
       {/* Quick Actions & Recent Activity grid */}
       <div className="mt-8 grid gap-6 md:grid-cols-2">
