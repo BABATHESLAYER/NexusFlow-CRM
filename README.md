@@ -3,8 +3,7 @@
 This is a NextJS starter in Firebase Studio.
 
 # Nexus Flow CRM
-
-![CRM Dashboard](https://i.imgur.com/5J8gE7x.png)
+<img width="1899" height="874" alt="image" src="https://github.com/user-attachments/assets/8eaa9c82-6095-45be-8685-17fb14bf7473" />
 
 An open-source, self-hostable Customer Relationship Management (CRM) system inspired by Odoo. Nexus Flow CRM is built with a modern tech stack and aims to provide a powerful, flexible, and user-friendly solution for managing customer interactions, sales pipelines, and business operations.
 
