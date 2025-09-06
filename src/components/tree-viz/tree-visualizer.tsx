@@ -53,9 +53,9 @@ const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ nodes, edges, width, he
               transition={{ type: 'spring', stiffness: 260, damping: 20 }}
             >
               <div className={cn(
-                "flex items-center justify-center w-full h-full rounded-full border-2 shadow-lg transition-colors duration-300",
+                "flex items-center justify-center w-full h-full rounded-full border-2 shadow-lg transition-all duration-300",
                 isVisited ? "bg-primary text-primary-foreground border-primary" : "bg-card text-card-foreground border-border",
-                isCurrent && "border-accent ring-4 ring-accent/50"
+                isCurrent && "border-ring ring-4 ring-ring/50 shadow-ring shadow-lg"
               )}>
                 <span className="text-lg font-bold">{node.val}</span>
               </div>
