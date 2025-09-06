@@ -18,10 +18,7 @@ export function TreeVizContainer() {
 
   const { nodes, edges, width, height } = useMemo(() => {
     if (!tree) return { nodes: [], edges: [], width: 0, height: 0 };
-    const layout = getTreeLayout(tree);
-    const maxX = Math.max(...layout.nodes.map(n => n.x), 0) + 50;
-    const maxY = Math.max(...layout.nodes.map(n => n.y), 0) + 50;
-    return { ...layout, width: maxX, height: maxY };
+    return getTreeLayout(tree);
   }, [tree]);
 
   const traversalSteps = useMemo(() => {
@@ -59,7 +56,7 @@ export function TreeVizContainer() {
     if (isPlaying && currentStepIndex < traversalSteps.length - 1) {
       timer = setTimeout(() => {
         setCurrentStepIndex(prev => prev + 1);
-      }, 2000);
+      }, 1000);
     } else if (isPlaying) {
       setIsPlaying(false);
     }

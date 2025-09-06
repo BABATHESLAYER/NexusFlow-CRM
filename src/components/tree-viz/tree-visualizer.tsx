@@ -15,9 +15,9 @@ interface TreeVisualizerProps {
 
 const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ nodes, edges, width, height, currentStep }) => {
   return (
-    <div className="absolute inset-0 p-4 flex items-center justify-center">
-      <div style={{ width, height }}>
-        <svg width={width} height={height} className="overflow-visible absolute">
+    <div className="absolute inset-0 p-4 grid place-content-center">
+      <div className="relative" style={{ width, height }}>
+        <svg width={width} height={height} className="overflow-visible absolute inset-0">
           <g>
             {edges.map((edge, i) => (
               <motion.line
@@ -55,7 +55,7 @@ const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ nodes, edges, width, he
               <div className={cn(
                 "flex items-center justify-center w-full h-full rounded-full border-2 shadow-lg transition-all duration-300",
                 isVisited ? "bg-primary text-primary-foreground border-primary" : "bg-card text-card-foreground border-border",
-                isCurrent && "border-ring ring-4 ring-ring/50 shadow-ring shadow-lg"
+                isCurrent && "border-primary ring-4 ring-primary/50 shadow-2xl shadow-primary/50"
               )}>
                 <span className="text-lg font-bold">{node.val}</span>
               </div>

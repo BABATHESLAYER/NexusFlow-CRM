@@ -132,7 +132,7 @@ export function generateInorderTraversalSteps(root: TreeNode | null): TraversalS
 export type NodeWithPosition = TreeNode & { x: number, y: number };
 export type Edge = { from: { x: number, y: number }, to: { x: number, y: number } };
 
-export function getTreeLayout(root: TreeNode | null): { nodes: NodeWithPosition[], edges: Edge[] } {
+export function getTreeLayout(root: TreeNode | null): { nodes: NodeWithPosition[], edges: Edge[], width: number, height: number } {
     const nodes: NodeWithPosition[] = [];
     const edges: Edge[] = [];
     
@@ -158,18 +158,29 @@ export function getTreeLayout(root: TreeNode | null): { nodes: NodeWithPosition[
     const initialWidth = 600;
     traverse(root, 0, 0, initialWidth / 4);
 
+    let minX = 0, maxX = 0, minY = 0, maxY = 0;
+    const padding = 50;
+
     if (nodes.length > 0) {
-        const minX = Math.min(...nodes.map(n => n.x));
-        const padding = 50;
+        minX = Math.min(...nodes.map(n => n.x));
+        maxX = Math.max(...nodes.map(n => n.x));
+        minY = Math.min(...nodes.map(n => n.y));
+        maxY = Math.max(...nodes.map(n => n.y));
         
         nodes.forEach(node => {
             node.x += Math.abs(minX) + padding;
+            node.y += Math.abs(minY) + padding;
         });
         edges.forEach(edge => {
             edge.from.x += Math.abs(minX) + padding;
+            edge.from.y += Math.abs(minY) + padding;
             edge.to.x += Math.abs(minX) + padding;
+            edge.to.y += Math.abs(minY) + padding;
         });
     }
 
-    return { nodes, edges };
+    const width = maxX - minX + (padding * 2);
+    const height = maxY - minY + (padding * 2);
+
+    return { nodes, edges, width, height };
 }
