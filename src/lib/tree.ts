@@ -136,7 +136,9 @@ export type Edge = { from: { x: number, y: number }, to: { x: number, y: number 
 
 const NODE_SEPARATION = 60;
 const LEVEL_SEPARATION = 100;
+const NODE_RADIUS = 24; // Corresponds to w-12/h-12 which is 3rem = 48px, so radius is 24
 
+// This is a simplified version of the Knuth-Reingold algorithm.
 function assignPositions(node: TreeNode | null, depth: number, xPos: { [id: number]: number }, yPos: { [id: number]: number }, xCounter: { val: number }) {
   if (node === null) return;
   
@@ -159,19 +161,16 @@ export function getTreeLayout(root: TreeNode | null): { nodes: NodeWithPosition[
     const xPos: { [id: number]: number } = {};
     const yPos: { [id: number]: number } = {};
     
-    // Using an object to pass by reference
     let xCounter = { val: 0 };
     assignPositions(root, 0, xPos, yPos, xCounter);
 
     const nodes: NodeWithPosition[] = [];
     const edges: Edge[] = [];
-    const q: TreeNode[] = [root];
-
+    
     let minX = Infinity, maxX = -Infinity, maxY = -Infinity;
 
     const nodeMap = new Map<number, NodeWithPosition>();
 
-    // First pass: create all node objects and calculate bounds
     const allNodes: TreeNode[] = [];
     const discoverQueue: (TreeNode|null)[] = [root];
     while(discoverQueue.length > 0) {
@@ -199,7 +198,6 @@ export function getTreeLayout(root: TreeNode | null): { nodes: NodeWithPosition[
         maxY = Math.max(maxY, ny);
     }
     
-    // Second pass: create edges
     for (const node of nodes) {
         if (node.left) {
             const childNode = nodeMap.get(node.left.id)!;
@@ -211,8 +209,7 @@ export function getTreeLayout(root: TreeNode | null): { nodes: NodeWithPosition[
         }
     }
 
-
-    const padding = 50;
+    const padding = NODE_RADIUS; // Use node radius for padding
     const width = maxX - minX + (padding * 2);
     const height = maxY + (padding * 2);
 
