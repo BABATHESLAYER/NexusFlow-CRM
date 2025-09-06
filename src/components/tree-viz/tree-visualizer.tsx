@@ -35,33 +35,35 @@ const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ nodes, edges, width, he
             ))}
           </g>
         </svg>
-        {nodes.map((node) => {
-          const isCurrent = currentStep?.currentNodeId === node.id;
-          const isVisited = currentStep?.visitedNodes.includes(node.id);
+        <div className="relative z-10">
+          {nodes.map((node) => {
+            const isCurrent = currentStep?.currentNodeId === node.id;
+            const isVisited = currentStep?.visitedNodes.includes(node.id);
 
-          return (
-            <motion.div
-              key={node.id}
-              className="absolute z-10 flex items-center justify-center w-12 h-12 -translate-x-1/2 -translate-y-1/2"
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ 
-                scale: 1, 
-                opacity: 1,
-                left: node.x,
-                top: node.y,
-              }}
-              transition={{ type: 'spring', stiffness: 260, damping: 20 }}
-            >
-              <div className={cn(
-                "flex items-center justify-center w-full h-full rounded-full border-2 shadow-lg transition-all duration-300",
-                isVisited ? "bg-primary text-primary-foreground border-primary" : "bg-card text-card-foreground border-border",
-                isCurrent && "border-primary ring-4 ring-primary/50 shadow-2xl shadow-primary/50"
-              )}>
-                <span className="text-lg font-bold">{node.val}</span>
-              </div>
-            </motion.div>
-          );
-        })}
+            return (
+              <motion.div
+                key={node.id}
+                className="absolute flex items-center justify-center w-12 h-12 -translate-x-1/2 -translate-y-1/2"
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ 
+                  scale: 1, 
+                  opacity: 1,
+                  left: node.x,
+                  top: node.y,
+                }}
+                transition={{ type: 'spring', stiffness: 260, damping: 20 }}
+              >
+                <div className={cn(
+                  "flex items-center justify-center w-full h-full rounded-full border-2 shadow-lg transition-all duration-300",
+                  isVisited ? "bg-primary text-primary-foreground border-primary" : "bg-card text-card-foreground border-border",
+                  isCurrent && "border-primary ring-4 ring-primary/50 shadow-2xl shadow-primary/50"
+                )}>
+                  <span className="text-lg font-bold">{node.val}</span>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

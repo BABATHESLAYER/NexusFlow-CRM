@@ -132,68 +132,207 @@ export function generateInorderTraversalSteps(root: TreeNode | null): TraversalS
 export type NodeWithPosition = TreeNode & { x: number, y: number };
 export type Edge = { from: { x: number, y: number }, to: { x: number, y: number } };
 
+// New layout logic based on https://rachel53461.wordpress.com/2014/04/20/algorithm-for-drawing-a-binary-tree/
+// With modifications for our use case.
+
+type NodeLayoutData = {
+  x: number;
+  y: number;
+  modifier: number;
+  node: TreeNode;
+};
+
+const NODE_SEPARATION = 60;
+const LEVEL_SEPARATION = 100;
+
 export function getTreeLayout(root: TreeNode | null): { nodes: NodeWithPosition[], edges: Edge[], width: number, height: number } {
-    const nodes: NodeWithPosition[] = [];
-    const edges: Edge[] = [];
+  if (!root) {
+    return { nodes: [], edges: [], width: 0, height: 0 };
+  }
+
+  const layoutMap = new Map<number, NodeLayoutData>();
+  let minX = Infinity;
+  let maxX = -Infinity;
+  let minY = Infinity;
+  let maxY = -Infinity;
+
+  function firstPass(node: TreeNode, depth: number) {
+    const layoutData: NodeLayoutData = { x: 0, y: depth * LEVEL_SEPARATION, modifier: 0, node };
+    layoutMap.set(node.id, layoutData);
+
+    if (node.left) {
+      firstPass(node.left, depth + 1);
+    }
+    if (node.right) {
+      firstPass(node.right, depth + 1);
+    }
+
+    if (!node.left && !node.right) { // isLeaf
+      layoutData.x = 0;
+    } else if (node.left && node.right) {
+      const leftChildLayout = layoutMap.get(node.left.id)!;
+      const rightChildLayout = layoutMap.get(node.right.id)!;
+      layoutData.x = (leftChildLayout.x + rightChildLayout.x) / 2;
+    } else if (node.left) {
+      const leftChildLayout = layoutMap.get(node.left.id)!;
+      layoutData.x = leftChildLayout.x + NODE_SEPARATION / 2;
+    } else { // only right child
+      const rightChildLayout = layoutMap.get(node.right.id)!;
+      layoutData.x = rightChildLayout.x - NODE_SEPARATION / 2;
+    }
     
-    function traverse(node: TreeNode | null, depth: number, x: number, xOffset: number) {
-        if (!node) return;
+    // Check for conflicts and apply modifier
+    if (node.left && node.right) {
+      // This is a simplified conflict check. A more robust solution
+      // would check all nodes at the same level.
+      const leftChildLayout = layoutMap.get(node.left.id)!;
+      const rightChildLayout = layoutMap.get(node.right.id)!;
+      const distance = rightChildLayout.x - leftChildLayout.x;
+      if (distance < NODE_SEPARATION) {
+        const shift = (NODE_SEPARATION - distance) / 2;
+        leftChildLayout.x -= shift;
+        rightChildLayout.x += shift;
+      }
+    }
+    
+    // Apply modifier from children
+    if(node.left) {
+        layoutData.modifier += layoutMap.get(node.left.id)!.modifier;
+    }
+    if(node.right) {
+        layoutData.modifier += layoutMap.get(node.right.id)!.modifier;
+    }
+    layoutData.x += layoutData.modifier;
+  }
+  
+  function secondPass(node: TreeNode, mod: number) {
+      const layoutData = layoutMap.get(node.id)!;
+      layoutData.x += mod;
 
-        node.x = x;
-        node.y = depth * 100 + 50; // Vertical spacing
-        nodes.push(node as NodeWithPosition);
+      minX = Math.min(minX, layoutData.x);
+      maxX = Math.max(maxX, layoutData.x);
+      minY = Math.min(minY, layoutData.y);
+      maxY = Math.max(maxY, layoutData.y);
 
-        if (node.left) {
-            const childX = x - xOffset;
-            edges.push({ from: { x: node.x, y: node.y }, to: { x: childX, y: (depth + 1) * 100 + 50 } });
-            traverse(node.left, depth + 1, childX, xOffset / 1.7);
-        }
-        if (node.right) {
-            const childX = x + xOffset;
-            edges.push({ from: { x: node.x, y: node.y }, to: { x: childX, y: (depth + 1) * 100 + 50 } });
-            traverse(node.right, depth + 1, childX, xOffset / 1.7);
-        }
+      if (node.left) {
+          secondPass(node.left, mod + layoutData.modifier);
+      }
+      if (node.right) {
+          secondPass(node.right, mod + layoutData.modifier);
+      }
+  }
+
+
+  function calculateInitialPositions(node: TreeNode | null, depth = 0, pos = 0): { [key: number]: number } {
+    if (!node) return {};
+    
+    const leftPositions = calculateInitialPositions(node.left, depth + 1);
+    const rightPositions = calculateInitialPositions(node.right, depth + 1);
+    
+    let positions = { ...leftPositions, ...rightPositions };
+    
+    let leftMost = Infinity;
+    let rightMost = -Infinity;
+
+    function findBounds(n: TreeNode | null) {
+        if(!n) return;
+        if(positions[n.id] < leftMost) leftMost = positions[n.id];
+        if(positions[n.id] > rightMost) rightMost = positions[n.id];
+        findBounds(n.left);
+        findBounds(n.right);
     }
 
-    const initialWidth = 600;
-    traverse(root, 0, 0, initialWidth / 4);
 
-    let minX = 0, maxX = 0, minY = 0, maxY = 0;
-    const padding = 50;
+    if (node.left && node.right) {
+        const leftSubtreePositions = getSubtreePositions(node.left, positions);
+        const rightSubtreePositions = getSubtreePositions(node.right, positions);
+        const leftMax = Math.max(...Object.values(leftSubtreePositions));
+        const rightMin = Math.min(...Object.values(rightSubtreePositions));
+        const shift = leftMax - rightMin + 1;
 
-    if (nodes.length > 0) {
-        minX = Math.min(...nodes.map(n => n.x));
-        maxX = Math.max(...nodes.map(n => n.x));
-        minY = Math.min(...nodes.map(n => n.y));
-        maxY = Math.max(...nodes.map(n => n.y));
-        
-        const xOffsetCorrection = (maxX + minX) / 2;
-        nodes.forEach(node => {
-            node.x -= xOffsetCorrection; // Center horizontally around 0
+        Object.keys(rightSubtreePositions).forEach(id => {
+            positions[Number(id)] += shift;
         });
-        edges.forEach(edge => {
-            edge.from.x -= xOffsetCorrection;
-            edge.to.x -= xOffsetCorrection;
-        });
-        
-        // Recalculate bounds after centering
-        minX = Math.min(...nodes.map(n => n.x));
-        maxX = Math.max(...nodes.map(n => n.x));
 
-        nodes.forEach(node => {
-            node.x += Math.abs(minX) + padding;
-            node.y += Math.abs(minY) + padding;
-        });
-        edges.forEach(edge => {
-            edge.from.x += Math.abs(minX) + padding;
-            edge.from.y += Math.abs(minY) + padding;
-            edge.to.x += Math.abs(minX) + padding;
-            edge.to.y += Math.abs(minY) + padding;
-        });
+        positions[node.id] = (leftMax + rightMin + shift) / 2;
+    } else if (node.left) {
+        positions[node.id] = positions[node.left.id] + 0.5;
+    } else if (node.right) {
+        positions[node.id] = positions[node.right.id] - 0.5;
+    } else {
+        positions[node.id] = pos;
     }
 
-    const width = maxX - minX + (padding * 2);
-    const height = maxY - minY + (padding * 2);
+    return positions;
+  }
+  
+  function getSubtreePositions(node: TreeNode, allPositions: { [key: number]: number }): { [key: number]: number } {
+      if (!node) return {};
+      const positions: { [key: number]: number } = { [node.id]: allPositions[node.id] };
+      Object.assign(positions, getSubtreePositions(node.left, allPositions));
+      Object.assign(positions, getSubtreePositions(node.right, allPositions));
+      return positions;
+  }
 
-    return { nodes, edges, width, height };
+
+  const xPositions = calculateInitialPositions(root);
+
+  const nodes: NodeWithPosition[] = [];
+  const edges: Edge[] = [];
+  const padding = 50;
+
+  let finalLayout = new Map<number, {x: number, y: number}>();
+  let minFinalX = Infinity;
+  let maxFinalX = -Infinity;
+  let maxFinalY = -Infinity;
+
+  function traverseAndSet(node: TreeNode, depth: number) {
+      const x = xPositions[node.id] * NODE_SEPARATION;
+      const y = depth * LEVEL_SEPARATION;
+      
+      finalLayout.set(node.id, { x, y });
+
+      minFinalX = Math.min(minFinalX, x);
+      maxFinalX = Math.max(maxFinalX, x);
+      maxFinalY = Math.max(maxFinalY, y);
+
+      if (node.left) traverseAndSet(node.left, depth + 1);
+      if (node.right) traverseAndSet(node.right, depth + 1);
+  }
+
+  traverseAndSet(root, 0);
+
+  const width = maxFinalX - minFinalX + (padding * 2);
+  const height = maxFinalY + (padding * 2);
+
+  const xOffset = -minFinalX + padding;
+  const yOffset = padding;
+
+  function buildFinalLayout(node: TreeNode) {
+    const layout = finalLayout.get(node.id)!;
+    const finalNode = node as NodeWithPosition;
+    finalNode.x = layout.x + xOffset;
+    finalNode.y = layout.y + yOffset;
+    nodes.push(finalNode);
+
+    if (node.left) {
+      const leftLayout = finalLayout.get(node.left.id)!;
+      edges.push({
+        from: { x: finalNode.x, y: finalNode.y },
+        to: { x: leftLayout.x + xOffset, y: leftLayout.y + yOffset }
+      });
+      buildFinalLayout(node.left);
+    }
+    if (node.right) {
+      const rightLayout = finalLayout.get(node.right.id)!;
+      edges.push({
+        from: { x: finalNode.x, y: finalNode.y },
+        to: { x: rightLayout.x + xOffset, y: rightLayout.y + yOffset }
+      });
+      buildFinalLayout(node.right);
+    }
+  }
+
+  buildFinalLayout(root);
+  return { nodes, edges, width, height };
 }
