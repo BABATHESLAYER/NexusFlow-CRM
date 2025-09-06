@@ -105,14 +105,16 @@ export function generateInorderTraversalSteps(root: TreeNode | null): TraversalS
             explanation: `Visiting the popped node ${current.val}. Its value is added to the result.`,
         });
 
+        const prevNodeVal = current.val;
         current = current.right;
+        
         steps.push({
-            action: current ? `Move to right child of ${stack[stack.length - 1]?.val ?? 'popped node'}` : `No right child`,
+            action: current ? `Move to right child of ${prevNodeVal}` : `No right child for ${prevNodeVal}`,
             currentNodeId: current?.id ?? null,
             stack: stack.map(n => n.val),
             visitedNodes: [...visitedNodes],
             codeLine: 7,
-            explanation: current ? `Moving to the right child of the visited node. The new current node is ${current.val}.` : `Moving to the right child of the visited node. The new current node is null.`,
+            explanation: current ? `Moving to the right child of the visited node. The new current node is ${current.val}.` : `The visited node has no right child. The loop will continue, and we'll pop from the stack again.`,
         });
     }
   }

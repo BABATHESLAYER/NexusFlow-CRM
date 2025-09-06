@@ -8,6 +8,8 @@ import { buildTree, generateInorderTraversalSteps, getTreeLayout, TraversalStep,
 import TreeVisualizer from './tree-visualizer';
 import StackVisualizer from './stack-visualizer';
 import Controls from './controls';
+import { PseudoCodeDisplay } from './pseudo-code-display';
+import { ScrollArea } from '../ui/scroll-area';
 
 const DEFAULT_TREE = "[4, 2, 7, 1, 3, 6, 9]";
 
@@ -102,40 +104,50 @@ export function TreeVizContainer() {
   return (
     <div className="grid md:grid-cols-[1fr_2fr_1fr] gap-6 p-4 md:p-6 h-[calc(100vh-4rem)]">
       {/* Left Column */}
-      <div className="flex flex-col gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Tree Definition</CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-4">
-             <Textarea
-              placeholder="e.g., [1, 2, 3, null, 4]"
-              value={userInput}
-              onChange={(e) => setUserInput(e.target.value)}
-              className="font-code"
-              rows={3}
-            />
-             {error && <p className="text-sm text-destructive">{error}</p>}
-            <Button onClick={handleBuildTree}>Build Tree</Button>
-          </CardContent>
-        </Card>
-        <Card>
-           <CardHeader>
-            <CardTitle>Controls</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Controls 
-              onPlayPause={handlePlayPause}
-              onNext={handleNext}
-              onPrev={handlePrev}
-              onReset={handleReset}
-              isPlaying={isPlaying}
-              isFirstStep={currentStepIndex === 0}
-              isLastStep={currentStepIndex === traversalSteps.length - 1}
-            />
-          </CardContent>
-        </Card>
-      </div>
+      <ScrollArea className="flex flex-col gap-6">
+        <div className="flex flex-col gap-6 pr-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Tree Definition</CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-4">
+              <Textarea
+                placeholder="e.g., [1, 2, 3, null, 4]"
+                value={userInput}
+                onChange={(e) => setUserInput(e.target.value)}
+                className="font-code"
+                rows={3}
+              />
+              {error && <p className="text-sm text-destructive">{error}</p>}
+              <Button onClick={handleBuildTree}>Build Tree</Button>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Controls</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Controls 
+                onPlayPause={handlePlayPause}
+                onNext={handleNext}
+                onPrev={handlePrev}
+                onReset={handleReset}
+                isPlaying={isPlaying}
+                isFirstStep={currentStepIndex === 0}
+                isLastStep={currentStepIndex === traversalSteps.length - 1}
+              />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Pseudocode</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <PseudoCodeDisplay currentLine={currentStep?.codeLine ?? 0} />
+            </CardContent>
+          </Card>
+        </div>
+      </ScrollArea>
       
       {/* Center Column */}
       <div className="flex flex-col gap-6">
