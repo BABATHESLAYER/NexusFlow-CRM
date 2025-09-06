@@ -25,6 +25,12 @@ const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ nodes, edges, width, he
             {edges.map((edge, i) => (
               <motion.line
                 key={i}
+                //
+                // --- MANUAL LINE FIX ---
+                // You can manually adjust the horizontal alignment of the lines here.
+                // To move a line RIGHT, add a positive number (e.g., edge.from.x + 10).
+                // To move a line LEFT, subtract a number (e.g., edge.from.x - 10).
+                //
                 x1={edge.from.x}
                 y1={edge.from.y}
                 x2={edge.to.x}
@@ -52,13 +58,13 @@ const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ nodes, edges, width, he
                   left: node.x,
                   top: node.y,
                   //
-                  // --- MANUAL FIX ---
-                  // You can manually adjust the horizontal alignment here.
+                  // --- MANUAL NODE FIX ---
+                  // You can manually adjust the horizontal alignment of the nodes here.
                   // To move the node LEFT, make the percentage MORE NEGATIVE (e.g., -60%, -70%).
                   // To move the node RIGHT, make the percentage LESS NEGATIVE (e.g., -40%, -30%).
                   // The default is -50% to center the node.
                   //
-                  transform: `translateX(-50%) translateY(-50%)`,
+                  transform: `translateX(-70%) translateY(-60%)`,
                 }}
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ 
