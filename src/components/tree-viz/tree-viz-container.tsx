@@ -8,7 +8,6 @@ import { buildTree, generateInorderTraversalSteps, getTreeLayout, TraversalStep,
 import TreeVisualizer from './tree-visualizer';
 import StackVisualizer from './stack-visualizer';
 import Controls from './controls';
-import ExplanationPanel from './explanation-panel';
 
 const DEFAULT_TREE = "[4, 2, 7, 1, 3, 6, 9]";
 
@@ -178,8 +177,6 @@ export function TreeVizContainer() {
             />
           </CardContent>
         </Card>
-
-        <ExplanationPanel currentStep={currentStep} />
       </div>
     </div>
   );
