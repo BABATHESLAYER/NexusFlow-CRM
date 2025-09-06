@@ -15,7 +15,7 @@ interface TreeVisualizerProps {
 
 const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ nodes, edges, width, height, currentStep }) => {
   return (
-    <div className="absolute inset-0 p-4 grid place-content-center">
+    <div className="absolute inset-0 grid place-content-center">
       <div className="relative" style={{ width, height }}>
         <svg width={width} height={height} className="overflow-visible absolute inset-0">
           <g>

@@ -167,6 +167,19 @@ export function getTreeLayout(root: TreeNode | null): { nodes: NodeWithPosition[
         minY = Math.min(...nodes.map(n => n.y));
         maxY = Math.max(...nodes.map(n => n.y));
         
+        const xOffsetCorrection = (maxX + minX) / 2;
+        nodes.forEach(node => {
+            node.x -= xOffsetCorrection; // Center horizontally around 0
+        });
+        edges.forEach(edge => {
+            edge.from.x -= xOffsetCorrection;
+            edge.to.x -= xOffsetCorrection;
+        });
+        
+        // Recalculate bounds after centering
+        minX = Math.min(...nodes.map(n => n.x));
+        maxX = Math.max(...nodes.map(n => n.x));
+
         nodes.forEach(node => {
             node.x += Math.abs(minX) + padding;
             node.y += Math.abs(minY) + padding;
