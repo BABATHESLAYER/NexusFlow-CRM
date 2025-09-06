@@ -137,75 +137,99 @@ export type Edge = { from: { x: number, y: number }, to: { x: number, y: number 
 const NODE_SEPARATION = 60;
 const LEVEL_SEPARATION = 100;
 
-export function getTreeLayout(root: TreeNode | null): { nodes: NodeWithPosition[], edges: Edge[], width: number, height: number } {
-  if (!root) {
-    return { nodes: [], edges: [], width: 0, height: 0 };
-  }
-
-  const xPos: { [id: number]: number } = {};
-  const yPos: { [id: number]: number } = {};
-  let x = 0;
+function assignPositions(node: TreeNode | null, depth: number, xPos: { [id: number]: number }, yPos: { [id: number]: number }, xCounter: { val: number }) {
+  if (node === null) return;
   
-  function inorderTraversal(node: TreeNode | null, depth: number) {
-    if (node === null) return;
-    inorderTraversal(node.left, depth + 1);
-    xPos[node.id] = x;
-    yPos[node.id] = depth;
-    x++;
-    inorderTraversal(node.right, depth + 1);
-  }
+  yPos[node.id] = depth;
 
-  inorderTraversal(root, 0);
+  assignPositions(node.left, depth + 1, xPos, yPos, xCounter);
+  
+  xPos[node.id] = xCounter.val;
+  xCounter.val++;
+  
+  assignPositions(node.right, depth + 1, xPos, yPos, xCounter);
+}
 
-  const nodes: NodeWithPosition[] = [];
-  const edges: Edge[] = [];
-  const queue = [root];
-  let minX = Infinity, maxX = -Infinity, maxY = -Infinity;
 
-  while(queue.length > 0) {
-    const node = queue.shift()!;
-    const nx = xPos[node.id] * NODE_SEPARATION;
-    const ny = yPos[node.id] * LEVEL_SEPARATION;
+export function getTreeLayout(root: TreeNode | null): { nodes: NodeWithPosition[], edges: Edge[], width: number, height: number } {
+    if (!root) {
+        return { nodes: [], edges: [], width: 0, height: 0 };
+    }
+
+    const xPos: { [id: number]: number } = {};
+    const yPos: { [id: number]: number } = {};
     
-    (node as NodeWithPosition).x = nx;
-    (node as NodeWithPosition).y = ny;
-    nodes.push(node as NodeWithPosition);
+    // Using an object to pass by reference
+    let xCounter = { val: 0 };
+    assignPositions(root, 0, xPos, yPos, xCounter);
 
-    minX = Math.min(minX, nx);
-    maxX = Math.max(maxX, nx);
-    maxY = Math.max(maxY, ny);
+    const nodes: NodeWithPosition[] = [];
+    const edges: Edge[] = [];
+    const q: TreeNode[] = [root];
 
-    if (node.left) {
-      const childX = xPos[node.left.id] * NODE_SEPARATION;
-      const childY = yPos[node.left.id] * LEVEL_SEPARATION;
-      edges.push({ from: { x: nx, y: ny }, to: { x: childX, y: childY }});
-      queue.push(node.left);
+    let minX = Infinity, maxX = -Infinity, maxY = -Infinity;
+
+    const nodeMap = new Map<number, NodeWithPosition>();
+
+    // First pass: create all node objects and calculate bounds
+    const allNodes: TreeNode[] = [];
+    const discoverQueue: (TreeNode|null)[] = [root];
+    while(discoverQueue.length > 0) {
+      const node = discoverQueue.shift();
+      if(node) {
+        allNodes.push(node);
+        discoverQueue.push(node.left);
+        discoverQueue.push(node.right);
+      }
     }
-    if (node.right) {
-      const childX = xPos[node.right.id] * NODE_SEPARATION;
-      const childY = yPos[node.right.id] * LEVEL_SEPARATION;
-      edges.push({ from: { x: nx, y: ny }, to: { x: childX, y: childY }});
-      queue.push(node.right);
+
+    for (const node of allNodes) {
+        const nx = xPos[node.id] * NODE_SEPARATION;
+        const ny = yPos[node.id] * LEVEL_SEPARATION;
+
+        const positionedNode = node as NodeWithPosition;
+        positionedNode.x = nx;
+        positionedNode.y = ny;
+        
+        nodes.push(positionedNode);
+        nodeMap.set(node.id, positionedNode);
+
+        minX = Math.min(minX, nx);
+        maxX = Math.max(maxX, nx);
+        maxY = Math.max(maxY, ny);
     }
-  }
+    
+    // Second pass: create edges
+    for (const node of nodes) {
+        if (node.left) {
+            const childNode = nodeMap.get(node.left.id)!;
+            edges.push({ from: { x: node.x, y: node.y }, to: { x: childNode.x, y: childNode.y } });
+        }
+        if (node.right) {
+            const childNode = nodeMap.get(node.right.id)!;
+            edges.push({ from: { x: node.x, y: node.y }, to: { x: childNode.x, y: childNode.y } });
+        }
+    }
 
-  const padding = 50;
-  const width = maxX - minX + (padding * 2);
-  const height = maxY + (padding * 2);
-  const xOffset = -minX + padding;
-  const yOffset = padding;
 
-  nodes.forEach(node => {
-    node.x += xOffset;
-    node.y += yOffset;
-  });
+    const padding = 50;
+    const width = maxX - minX + (padding * 2);
+    const height = maxY + (padding * 2);
 
-  edges.forEach(edge => {
-    edge.from.x += xOffset;
-    edge.from.y += yOffset;
-    edge.to.x += xOffset;
-    edge.to.y += yOffset;
-  });
+    const xOffset = -minX + padding;
+    const yOffset = padding;
 
-  return { nodes, edges, width, height };
+    nodes.forEach(node => {
+        node.x += xOffset;
+        node.y += yOffset;
+    });
+
+    edges.forEach(edge => {
+        edge.from.x += xOffset;
+        edge.from.y += yOffset;
+        edge.to.x += xOffset;
+        edge.to.y += yOffset;
+    });
+
+    return { nodes, edges, width, height };
 }
