@@ -51,6 +51,13 @@ const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ nodes, edges, width, he
                 style={{
                   left: node.x,
                   top: node.y,
+                  //
+                  // --- MANUAL FIX ---
+                  // You can manually adjust the horizontal alignment here.
+                  // To move the node LEFT, make the percentage MORE NEGATIVE (e.g., -60%, -70%).
+                  // To move the node RIGHT, make the percentage LESS NEGATIVE (e.g., -40%, -30%).
+                  // The default is -50% to center the node.
+                  //
                   transform: `translateX(-50%) translateY(-50%)`,
                 }}
                 initial={{ scale: 0, opacity: 0 }}
@@ -63,7 +70,7 @@ const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ nodes, edges, width, he
                 <div className={cn(
                   "flex items-center justify-center w-full h-full rounded-full border-2 shadow-lg transition-all duration-300",
                   isVisited ? "bg-primary text-primary-foreground border-primary" : "bg-card text-card-foreground border-border",
-                  isCurrent && "border-primary ring-4 ring-primary/30 shadow-[0_0_80px_24px] shadow-primary/60 scale-110"
+                  isCurrent && "border-primary ring-4 ring-primary/30 shadow-[0_0_20px_8px] shadow-primary/30"
                 )}>
                   <span className="text-lg font-bold">{node.val}</span>
                 </div>
