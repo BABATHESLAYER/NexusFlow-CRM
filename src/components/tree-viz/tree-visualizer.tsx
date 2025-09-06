@@ -28,6 +28,7 @@ const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ nodes, edges, width, he
                 y2={edge.to.y}
                 stroke="hsl(var(--muted-foreground))"
                 strokeWidth="2"
+                strokeDasharray="4 4"
                 initial={{ pathLength: 0 }}
                 animate={{ pathLength: 1 }}
                 transition={{ duration: 0.5, delay: i * 0.05 }}
@@ -56,7 +57,7 @@ const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ nodes, edges, width, he
                 <div className={cn(
                   "flex items-center justify-center w-full h-full rounded-full border-2 shadow-lg transition-all duration-300",
                   isVisited ? "bg-primary text-primary-foreground border-primary" : "bg-card text-card-foreground border-border",
-                  isCurrent && "border-primary ring-8 ring-primary/30 shadow-[0_0_40px_18px] shadow-primary/60 scale-110"
+                  isCurrent && "border-primary ring-4 ring-primary/30 shadow-[0_0_40px_18px] shadow-primary/60 scale-110"
                 )}>
                   <span className="text-lg font-bold">{node.val}</span>
                 </div>
