@@ -46,7 +46,7 @@ const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ nodes, edges, width, he
                 key={node.id}
                 className="absolute flex items-center justify-center w-12 h-12"
                 style={{
-                  transform: `translateX(-100%) translateY(-50%)`,
+                  transform: `translateX(-50%) translateY(-50%)`,
                 }}
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ 
