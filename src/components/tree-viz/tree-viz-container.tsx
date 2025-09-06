@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { buildTree, generateInorderTraversalSteps, getTreeLayout, TraversalStep, TreeNode } from '@/lib/tree';
 import TreeVisualizer from './tree-visualizer';
 import StackVisualizer from './stack-visualizer';
@@ -100,54 +100,8 @@ export function TreeVizContainer() {
   }, [currentStep, nodes]);
 
   return (
-    <div className="grid md:grid-cols-[minmax(0,_2fr)_minmax(0,_1fr)] gap-6 p-4 md:p-6 h-full">
-      <div className="flex flex-col gap-6">
-        <Card className="flex-grow">
-          <CardHeader>
-            <CardTitle>Tree Visualization</CardTitle>
-          </CardHeader>
-          <CardContent className="relative min-h-[300px] md:min-h-[400px] w-full overflow-auto">
-            {tree ? (
-              <TreeVisualizer
-                nodes={nodes}
-                edges={edges}
-                width={width}
-                height={height}
-                currentStep={currentStep}
-              />
-            ) : (
-              <div className="flex items-center justify-center h-full text-muted-foreground">
-                <p>{error || "Build a tree to begin."}</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Stack</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <StackVisualizer stack={currentStep?.stack ?? []} />
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>Visited Nodes (Inorder)</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap gap-2 p-2 bg-muted rounded-md min-h-[50px] items-center">
-                {visitedOutput.map((val, i) => (
-                  <div key={i} className="flex items-center justify-center h-10 w-10 bg-primary text-primary-foreground rounded-md font-bold text-lg shadow-md">
-                    {val}
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-
+    <div className="grid md:grid-cols-[1fr_2fr_1fr] gap-6 p-4 md:p-6 h-[calc(100vh-4rem)]">
+      {/* Left Column */}
       <div className="flex flex-col gap-6">
         <Card>
           <CardHeader>
@@ -163,6 +117,13 @@ export function TreeVizContainer() {
             />
              {error && <p className="text-sm text-destructive">{error}</p>}
             <Button onClick={handleBuildTree}>Build Tree</Button>
+          </CardContent>
+        </Card>
+        <Card>
+           <CardHeader>
+            <CardTitle>Controls</CardTitle>
+          </CardHeader>
+          <CardContent>
             <Controls 
               onPlayPause={handlePlayPause}
               onNext={handleNext}
@@ -172,6 +133,56 @@ export function TreeVizContainer() {
               isFirstStep={currentStepIndex === 0}
               isLastStep={currentStepIndex === traversalSteps.length - 1}
             />
+          </CardContent>
+        </Card>
+      </div>
+      
+      {/* Center Column */}
+      <div className="flex flex-col gap-6">
+        <Card className="flex-grow flex flex-col">
+          <CardHeader>
+            <CardTitle>Tree Visualization</CardTitle>
+          </CardHeader>
+          <CardContent className="relative flex-1">
+            {tree ? (
+              <TreeVisualizer
+                nodes={nodes}
+                edges={edges}
+                width={width}
+                height={height}
+                currentStep={currentStep}
+              />
+            ) : (
+              <div className="flex items-center justify-center h-full text-muted-foreground">
+                <p>{error || "Build a tree to begin."}</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+      
+      {/* Right Column */}
+      <div className="flex flex-col gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Stack</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <StackVisualizer stack={currentStep?.stack ?? []} />
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Visited Nodes (Inorder)</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-2 p-2 bg-muted rounded-md min-h-[50px] items-center">
+              {visitedOutput.map((val, i) => (
+                <div key={i} className="flex items-center justify-center h-10 w-10 bg-primary text-primary-foreground rounded-md font-bold text-lg shadow-md">
+                  {val}
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
       </div>
