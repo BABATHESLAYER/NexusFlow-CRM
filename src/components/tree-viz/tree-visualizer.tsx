@@ -17,7 +17,7 @@ const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ nodes, edges, width, he
   return (
     <div className="absolute inset-0 grid place-content-center">
       <div className="relative" style={{ width, height }}>
-        <svg width={width} height={height} className="overflow-visible absolute inset-0">
+        <svg width={width} height={height} className="overflow-visible absolute inset-0 z-0">
           <g>
             {edges.map((edge, i) => (
               <motion.line
@@ -42,7 +42,7 @@ const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ nodes, edges, width, he
           return (
             <motion.div
               key={node.id}
-              className="absolute flex items-center justify-center w-12 h-12 -translate-x-1/2 -translate-y-1/2"
+              className="absolute z-10 flex items-center justify-center w-12 h-12 -translate-x-1/2 -translate-y-1/2"
               initial={{ scale: 0, opacity: 0 }}
               animate={{ 
                 scale: 1, 
