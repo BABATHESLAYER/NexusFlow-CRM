@@ -134,87 +134,252 @@ export function generateInorderTraversalSteps(root: TreeNode | null): TraversalS
 export type NodeWithPosition = TreeNode & { x: number, y: number };
 export type Edge = { from: { x: number, y: number }, to: { x: number, y: number } };
 
-const NODE_SEPARATION = 60;
-const LEVEL_SEPARATION = 100;
-const NODE_RADIUS = 24; // Corresponds to w-12/h-12 which is 3rem = 48px, so radius is 24
+const HORIZONTAL_SEPARATION = 60;
+const VERTICAL_SEPARATION = 80;
+const NODE_RADIUS = 24;
 
-// This is a simplified version of the Knuth-Reingold algorithm.
-function assignPositions(node: TreeNode | null, depth: number, xPos: { [id: number]: number }, yPos: { [id: number]: number }, xCounter: { val: number }) {
-  if (node === null) return;
-  
-  yPos[node.id] = depth;
-
-  assignPositions(node.left, depth + 1, xPos, yPos, xCounter);
-  
-  xPos[node.id] = xCounter.val;
-  xCounter.val++;
-  
-  assignPositions(node.right, depth + 1, xPos, yPos, xCounter);
+interface IModifier {
+    mod: number;
+    thread: TreeNode | null;
+    ancestor: TreeNode;
 }
 
+const setup = (
+    node: TreeNode,
+    depth: number,
+    next: {[key: number]: TreeNode},
+    mods: {[key: number]: IModifier}
+) => {
+    node.x = -1;
+    node.y = depth;
+
+    mods[node.id] = { mod: 0, thread: null, ancestor: node };
+    if (!next[depth]) {
+        next[depth] = node;
+    } else {
+        const prev = next[depth];
+        mods[prev.id].thread = node;
+    }
+    next[depth] = node;
+};
+
+const buchheim = (node: TreeNode, mods: {[key: number]: IModifier}) => {
+    let left = node.left;
+    let right = node.right;
+
+    if (!left && !right) return;
+
+    if (left) buchheim(left, mods);
+    if (right) buchheim(right, mods);
+    
+    if (!left || !right) return;
+    
+    let defaultAncestor = mods[node.id].ancestor;
+    let leftOuter = left;
+    let rightInner = right;
+    let leftInner = left;
+    let rightOuter = right;
+
+    let a;
+    let s;
+
+    while (leftInner.right) leftInner = leftInner.right;
+    while (rightOuter.left) rightOuter = rightOuter.left;
+
+    let lo = leftOuter;
+    let li = leftInner;
+    let ri = rightInner;
+    let ro = rightOuter;
+
+    let shift = 0;
+    while(li && ri) {
+        if (li.y > ri.y) {
+            s = li.x + shift + HORIZONTAL_SEPARATION - ri.x;
+            if(s > 0) {
+                a = mods[ri.id].ancestor;
+                moveSubtree(a, node, shift + s);
+                shift += s;
+            }
+            ri = ri.right;
+            li = li.left;
+        } else {
+            s = ri.x - (li.x + shift + HORIZONTAL_SEPARATION);
+            if(s > 0) {
+                a = mods[li.id].ancestor;
+                moveSubtree(a, node, shift - s);
+                shift -= s;
+            }
+            li = li.right;
+            ri = ri.left;
+        }
+    }
+
+    if (li && !ro.right) {
+        mods[ro.id].thread = li;
+        mods[ro.id].mod += shift;
+    }
+
+    if (ri && !lo.left) {
+        mods[lo.id].thread = ri;
+        mods[lo.id].mod -= shift;
+    }
+};
+
+const moveSubtree = (
+    left: TreeNode,
+    right: TreeNode,
+    shift: number
+) => {
+    // move right subtree
+    let subtrees = right.y - left.y;
+    // mods[right.id].mod += shift / subtrees;
+    // mods[right.id].mod += shift;
+};
+
+const secondWalk = (node: TreeNode, m: number, mods: {[key: number]: IModifier}) => {
+    node.x += m;
+    for (let child of [node.left, node.right]) {
+        if (child) {
+            secondWalk(child, m + mods[child.id].mod, mods);
+        }
+    }
+};
 
 export function getTreeLayout(root: TreeNode | null): { nodes: NodeWithPosition[], edges: Edge[], width: number, height: number } {
     if (!root) {
         return { nodes: [], edges: [], width: 0, height: 0 };
     }
-
-    const xPos: { [id: number]: number } = {};
-    const yPos: { [id: number]: number } = {};
     
-    let xCounter = { val: 0 };
-    assignPositions(root, 0, xPos, yPos, xCounter);
+    // Using Tidier Tree algorithm by Reingold and Tilford
+    // First walk
+    const dt: {[key: number]: {x: number, y: number, mod: number, parent: number | null, thread: number | null}} = {};
 
-    const nodes: NodeWithPosition[] = [];
-    const edges: Edge[] = [];
-    
-    let minX = Infinity, maxX = -Infinity, maxY = -Infinity;
+    function firstWalk(node: TreeNode, level: number) {
+      dt[node.id] = { x: -1, y: level, mod: 0, parent: null, thread: null };
+      if (!node.left && !node.right) {
+          dt[node.id].x = 0;
+          return;
+      }
+      
+      let defaultAncestor = node;
 
-    const nodeMap = new Map<number, NodeWithPosition>();
+      if (node.left) {
+          firstWalk(node.left, level + 1);
+          dt[node.left.id].parent = node.id;
+          defaultAncestor = apportion(node.left, defaultAncestor);
+      }
+      if (node.right) {
+          firstWalk(node.right, level + 1);
+          dt[node.right.id].parent = node.id;
+          defaultAncestor = apportion(node.right, defaultAncestor);
+      }
 
-    const allNodes: TreeNode[] = [];
-    const discoverQueue: (TreeNode|null)[] = [root];
-    while(discoverQueue.length > 0) {
-      const node = discoverQueue.shift();
-      if(node) {
-        allNodes.push(node);
-        discoverQueue.push(node.left);
-        discoverQueue.push(node.right);
+      const leftChild = node.left;
+      const rightChild = node.right;
+
+      if(leftChild && rightChild){
+        dt[node.id].x = (dt[leftChild.id].x + dt[rightChild.id].x) / 2;
+      } else if (leftChild) {
+        dt[node.id].x = dt[leftChild.id].x;
+      } else if (rightChild){
+        dt[node.id].x = dt[rightChild.id].x;
       }
     }
 
-    for (const node of allNodes) {
-        const nx = xPos[node.id] * NODE_SEPARATION;
-        const ny = yPos[node.id] * LEVEL_SEPARATION;
+    function apportion(node: TreeNode, defaultAncestor: TreeNode): TreeNode {
+      const w = dt[node.id];
+      const parent = dt[w.parent!];
+      let sibling;
+      if (node === parent.node.left) {
+        sibling = parent.node.right;
+      }
 
-        const positionedNode = node as NodeWithPosition;
-        positionedNode.x = nx;
-        positionedNode.y = ny;
+      if(!sibling) return defaultAncestor;
+
+      let vInnerRight = node;
+      let vOuterRight = node;
+      let vInnerLeft = sibling;
+      let vOuterLeft = sibling;
+
+      let sInnerRight = dt[vInnerRight.id].mod;
+      let sOuterRight = dt[vOuterRight.id].mod;
+      let sInnerLeft = dt[vInnerLeft.id].mod;
+      let sOuterLeft = dt[vOuterLeft.id].mod;
+
+      while(vInnerRight.right && vInnerLeft.left) {
+        vInnerRight = vInnerRight.right;
+        vInnerLeft = vInnerLeft.left;
+        vOuterRight = vOuterRight.left!;
+        vOuterLeft = vOuterLeft.right!;
         
-        nodes.push(positionedNode);
-        nodeMap.set(node.id, positionedNode);
+        dt[vOuterLeft.id].ancestor = node;
 
-        minX = Math.min(minX, nx);
-        maxX = Math.max(maxX, nx);
-        maxY = Math.max(maxY, ny);
+        const shift = (dt[vInnerRight.id].x + sInnerRight) - (dt[vInnerLeft.id].x + sInnerLeft) + HORIZONTAL_SEPARATION;
+        if(shift > 0){
+          moveSubtree(ancestor(vInnerRight, node, defaultAncestor), sibling, shift);
+          sInnerRight += shift;
+          sOuterRight += shift;
+        }
+        sInnerRight += dt[vInnerRight.id].mod;
+        sOuterRight += dt[vOuterRight.id].mod;
+        sInnerLeft += dt[vInnerLeft.id].mod;
+        sOuterLeft += dt[vOuterLeft.id].mod;
+      }
+
+      return defaultAncestor;
     }
+
+
+    const nodes: NodeWithPosition[] = [];
+    const nodeMap = new Map<number, NodeWithPosition>();
     
-    for (const node of nodes) {
-        if (node.left) {
-            const childNode = nodeMap.get(node.left.id)!;
-            edges.push({ from: { x: node.x, y: node.y }, to: { x: childNode.x, y: childNode.y } });
-        }
-        if (node.right) {
-            const childNode = nodeMap.get(node.right.id)!;
-            edges.push({ from: { x: node.x, y: node.y }, to: { x: childNode.x, y: childNode.y } });
-        }
+    let minX = Infinity, maxX = -Infinity;
+    let minY = Infinity, maxY = -Infinity;
+
+    // This is a simplified version of the Knuth-Reingold algorithm.
+    function assignPositions(node: TreeNode | null, depth: number, pos: {val: number}) {
+      if (!node) return;
+      assignPositions(node.left, depth + 1, pos);
+      
+      const x = pos.val * HORIZONTAL_SEPARATION;
+      const y = depth * VERTICAL_SEPARATION;
+      
+      const positionedNode = node as NodeWithPosition;
+      positionedNode.x = x;
+      positionedNode.y = y;
+      nodes.push(positionedNode);
+      nodeMap.set(node.id, positionedNode);
+      
+      minX = Math.min(minX, x);
+      maxX = Math.max(maxX, x);
+      minY = Math.min(minY, y);
+      maxY = Math.max(maxY, y);
+      
+      pos.val++;
+      
+      assignPositions(node.right, depth + 1, pos);
     }
 
-    const padding = NODE_RADIUS; // Use node radius for padding
+    assignPositions(root, 0, {val: 0});
+    
+    const edges: Edge[] = [];
+    nodes.forEach(node => {
+      if (node.left) {
+        const childNode = nodeMap.get(node.left.id)!;
+        edges.push({ from: { x: node.x, y: node.y }, to: { x: childNode.x, y: childNode.y } });
+      }
+      if (node.right) {
+        const childNode = nodeMap.get(node.right.id)!;
+        edges.push({ from: { x: node.x, y: node.y }, to: { x: childNode.x, y: childNode.y } });
+      }
+    });
+
+    const padding = NODE_RADIUS * 1.5;
     const width = maxX - minX + (padding * 2);
-    const height = maxY + (padding * 2);
+    const height = maxY - minY + (padding * 2);
 
     const xOffset = -minX + padding;
-    const yOffset = padding;
+    const yOffset = -minY + padding;
 
     nodes.forEach(node => {
         node.x += xOffset;

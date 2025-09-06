@@ -14,6 +14,9 @@ interface TreeVisualizerProps {
 }
 
 const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ nodes, edges, width, height, currentStep }) => {
+  if (width === 0 || height === 0) {
+    return null;
+  }
   return (
     <div className="absolute inset-0 grid place-content-center">
       <div className="relative" style={{ width, height }}>
@@ -46,14 +49,14 @@ const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ nodes, edges, width, he
                 key={node.id}
                 className="absolute flex items-center justify-center w-12 h-12"
                 style={{
+                  left: node.x,
+                  top: node.y,
                   transform: `translateX(-50%) translateY(-50%)`,
                 }}
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ 
                   scale: 1, 
                   opacity: 1,
-                  left: node.x,
-                  top: node.y,
                 }}
                 transition={{ type: 'spring', stiffness: 260, damping: 20 }}
               >
